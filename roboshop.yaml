@@ -4,6 +4,7 @@
   vars: 
      sg_id: sg-0f99207bb9a2cd68c
      ami_id: ami-0220d79f3f480ecf5
+     domain_name: rawsd.in 
      env: dev 
      instances: 
        - mongodb
@@ -25,4 +26,15 @@
 
     - name: print output
       ansible.builtin.debug:
-        msg: "{{ ec2_outputs }}"   
+        msg: "{{ ec2_outputs }}"
+    - name: create route53 records
+      amazon.aws.route53:
+        state: present
+        zone: "{{domain_name}}"
+        record: "{{ item.item }}-{{env}}.{{domain_name}}" #mongodb-dev-rawsd.in
+        type: A 
+        ttl: 1
+        value: "{{ item.instances[0].private_ip_address }}" 
+        wait: true
+      loop: "{{ec2_outputs.results}}" 
+        
