@@ -54,7 +54,7 @@
         wait: true
       loop: "{{ec2_outputs.results}}"
       when: # and 
-        - item.item == frontend  
+        - item.item == "frontend"  
         - action == "create"
 
     - name: delete route53 record
@@ -68,7 +68,7 @@
       when: action == "destroy"
 
     - name: delete ec2-instance
-      ansible.aws.ec2_instance:
+      amazon.aws.ec2_instance:
         state: absent
         name: "{{ item }}-{{ env }}"
       loop: "{{ instances }}"
