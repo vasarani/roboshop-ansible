@@ -6,6 +6,7 @@
      ami_id: ami-0220d79f3f480ecf5
      domain_name: rawsd.in 
      env: dev 
+     action: create
      instances: 
        - mongodb
        - Catalogue
@@ -23,10 +24,13 @@
            Name: "{{ item }}-{{ env }}"
       loop: "{{ instances }}"
       register: ec2_outputs
+      when: action == "create"
 
     - name: print output
       ansible.builtin.debug:
         msg: "{{ ec2_outputs }}"
+      when: action == "create"  
+
     - name: create route53 records
       amazon.aws.route53:
         state: present
@@ -37,6 +41,7 @@
         value: "{{ item.instances[0].private_ip_address }}" 
         wait: true
       loop: "{{ec2_outputs.results}}" 
+      when: action == "create"
 
     - name: create r53 for frontend
       amazon.aws.route53:
@@ -48,5 +53,13 @@
         value: "{{item.instances[0].public_ip_address}}"
         wait: true
       loop: "{{ec2_outputs.results}}"
-      when: item.item == frontend  
-        
+      when: # and 
+        - item.item == frontend  
+        - action == "create"
+
+    - name: delete ec2-instance
+      ansible.aws.ec2_instance:
+        state: absent
+        name: "{{ item }}-{{ env }}"
+      loop: "{{ instances }}"
+      
