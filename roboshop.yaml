@@ -40,6 +40,7 @@
         ttl: 1
         value: "{{ item.instances[0].private_ip_address }}" 
         wait: true
+        overwrite: true
       loop: "{{ec2_outputs.results}}" 
       when: action == "create"
 
@@ -52,6 +53,7 @@
         ttl: 1 
         value: "{{item.instances[0].public_ip_address}}"
         wait: true
+        overwrite: true
       loop: "{{ec2_outputs.results}}"
       when: # and 
         - item.item == "frontend"  
