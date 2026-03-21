@@ -57,7 +57,7 @@
     - name: create systemctl service
       ansible.builtin.template:
          src: shipping.service
-         dest: /stc/systemd/system/shipping.service
+         dest: /etc/systemd/system/shipping.service
 
     - name: daemon reload
       ansible.builtin.systemd_service:
@@ -81,5 +81,5 @@
         name: shipping
         state: restarted
         enabled: yes
-        
+
 
